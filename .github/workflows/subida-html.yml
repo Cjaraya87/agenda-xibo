@@ -1,0 +1,24 @@
+name: Subir HTML diario desde Google Drive
+
+on:
+  schedule:
+    - cron: '10 3 * * *'  # Todos los días a las 00:10 (hora Argentina = UTC-3)
+  workflow_dispatch:
+
+jobs:
+  actualizar-html:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Descargar HTML desde Google Drive
+        run: curl -L "https://drive.google.com/uc?export=download&id=1S5Lrv0UO4C5MQ44RoF7YEFsDC5l4Y8g-" -o agenda.html
+
+      - name: Hacer commit si hay cambios
+        run: |
+          git config --local user.email "bot@github.com"
+          git config --local user.name "GitHub Action"
+          git add agenda.html
+          git commit -m "Actualización diaria de agenda.html" || echo "Sin cambios"
+          git push
